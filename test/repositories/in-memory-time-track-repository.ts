@@ -1,6 +1,9 @@
 import { type TimeTrack } from '@/domain/enterprise/entities/time-track'
-import { IFindByOwnerAndTimeParams, type TimeTrackRepository } from '@/domain/application/repositories/time-track-repository'
+import { IFindByOwnerAndTimeParams, IFindManyByOwnerAndWorkspace, type TimeTrackRepository } from '@/domain/application/repositories/time-track-repository'
 import { compareDate } from '@/core/utils/compare-date'
+import dayjs from 'dayjs'
+import isBetween from 'dayjs/plugin/isBetween'
+dayjs.extend(isBetween)
 
 export class InMemoryTimeTrackRepository implements TimeTrackRepository {
   items: TimeTrack[] = []
@@ -18,6 +21,18 @@ export class InMemoryTimeTrackRepository implements TimeTrackRepository {
     }
 
     return timetrack[0]
+  }
+
+  async findManyByOwnerAndWorkspace (params: IFindManyByOwnerAndWorkspace) {
+    const timetracks = this.items
+      .filter(item => (
+        item.ownerId.toString === params.ownerId &&
+        item.workspaceId.toString === params.workspaceId &&
+        dayjs(item.registeredAt).isBetween(dayjs(params.range.start).add(1, 'day'), dayjs(params.range.end).subtract(1, 'day'))
+      ))
+      .sort((a, b) => b.registeredAt > a.registeredAt ? -1 : 1)
+
+    return timetracks
   }
 
   async findById(id: string) {
