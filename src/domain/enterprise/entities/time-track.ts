@@ -14,7 +14,11 @@ export class TimeTrack extends Entity<ITimeTrack> {
   }
 
   get description () {
-    return this.props.description
+    return this.props.description ?? ''
+  }
+
+  set description(value: string) {
+    this.props.description = value
   }
 
   get ownerId () {
@@ -23,6 +27,10 @@ export class TimeTrack extends Entity<ITimeTrack> {
 
   get registeredAt () {
     return this.props.registered_at
+  }
+
+  set registeredAt (value: Date) {
+    this.props.registered_at = value
   }
 
   static create (props: Partial<ITimeTrack>, id?: UniqueId) {

@@ -8,4 +8,5 @@ export interface IFindByOwnerAndTimeParams {
 export interface TimeTrackRepository {
   create: (timetrack: TimeTrack) => Promise<void>
   findByOwnerAndTime: (params: IFindByOwnerAndTimeParams) => Promise<TimeTrack | null>
+  findById: (id: string) => Promise<TimeTrack | null>
 }
