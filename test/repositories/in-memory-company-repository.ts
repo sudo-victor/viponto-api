@@ -1,5 +1,5 @@
 import { CompanyRepository } from "@/domain/application/repositories/company-repository"
-import { Company } from "@/domain/users/enterprise/entities/company";
+import { Company } from "@/domain/enterprise/entities/company";
 
 export class InMemoryCompanyRepository implements CompanyRepository {
   items: Company[] = []

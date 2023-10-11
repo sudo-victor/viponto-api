@@ -1,5 +1,5 @@
 import { type WorkspaceRepository } from '@/domain/application/repositories/workspace-repository'
-import { type Workspace } from '@/domain/users/enterprise/entities/workspace'
+import { type Workspace } from '@/domain/enterprise/entities/workspace'
 
 export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   items: Workspace[] = []
