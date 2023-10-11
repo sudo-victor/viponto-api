@@ -17,4 +17,14 @@ export class InMemoryManagerRepository implements ManagerRepository {
 
     return manager
   }
+
+  async findById(id: string) {
+    const manager = this.items.find(item => item.id.toString === id)
+
+    if (!manager) {
+      return null
+    }
+
+    return manager
+  }
 }
