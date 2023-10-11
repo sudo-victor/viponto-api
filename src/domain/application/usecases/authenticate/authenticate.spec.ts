@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker"
 
 import { AuthenticateUseCase } from "."
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
-import { Manager } from "@/domain/users/enterprise/entities/manager"
+import { Manager } from "@/domain/enterprise/entities/manager"
 import { hash } from "bcryptjs"
 
 let managerRepository: InMemoryManagerRepository

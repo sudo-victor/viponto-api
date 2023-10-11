@@ -1,9 +1,7 @@
-import { hash } from 'bcryptjs'
-
-import { Workspace } from '@/domain/users/enterprise/entities/workspace'
 import { type WorkspaceRepository } from '../../repositories/workspace-repository'
 import { UniqueId } from '@/core/entities/value-objects/unique-id'
 import { CompanyRepository } from '../../repositories/company-repository'
+import { Workspace } from '@/domain/enterprise/entities/workspace'
 
 interface CreateWorkspaceUseCaseRequest {
   name: string

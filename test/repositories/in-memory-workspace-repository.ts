@@ -1,4 +1,4 @@
-import { type WorkspaceRepository } from '@/domain/users/application/repositories/workspace-repository'
+import { type WorkspaceRepository } from '@/domain/application/repositories/workspace-repository'
 import { type Workspace } from '@/domain/users/enterprise/entities/workspace'
 
 export class InMemoryWorkspaceRepository implements WorkspaceRepository {

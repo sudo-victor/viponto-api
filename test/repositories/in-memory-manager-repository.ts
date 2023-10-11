@@ -1,4 +1,4 @@
-import { type ManagerRepository } from '@/domain/users/application/repositories/manager-repository'
+import { type ManagerRepository } from '@/domain/application/repositories/manager-repository'
 import { type Manager } from '@/domain/users/enterprise/entities/manager'
 
 export class InMemoryManagerRepository implements ManagerRepository {

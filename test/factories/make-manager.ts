@@ -1,5 +1,5 @@
 import { UniqueId } from "@/core/entities/value-objects/unique-id";
-import { Manager } from "@/domain/users/enterprise/entities/manager";
+import { Manager } from "@/domain/enterprise/entities/manager";
 import { faker } from "@faker-js/faker";
 import { hash } from "bcryptjs";
 

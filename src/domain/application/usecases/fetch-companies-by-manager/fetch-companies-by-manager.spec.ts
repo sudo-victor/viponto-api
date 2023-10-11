@@ -5,8 +5,6 @@ import { FetchCompaniesByManagerUseCase } from "."
 import { UniqueId } from "@/core/entities/value-objects/unique-id"
 import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-repository"
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
-import { Manager } from "@/domain/users/enterprise/entities/manager"
-import { hash } from "bcryptjs"
 import { makeManager } from "test/factories/make-manager"
 import { makeCompany } from "test/factories/make-company"
 

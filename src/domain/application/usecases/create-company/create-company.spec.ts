@@ -5,7 +5,7 @@ import { CreateCompanyUseCase } from "."
 import { UniqueId } from "@/core/entities/value-objects/unique-id"
 import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-repository"
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
-import { Manager } from "@/domain/users/enterprise/entities/manager"
+import { Manager } from "@/domain/enterprise/entities/manager"
 import { hash } from "bcryptjs"
 
 let companyRepository: InMemoryCompanyRepository

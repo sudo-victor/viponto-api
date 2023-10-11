@@ -1,8 +1,8 @@
-import { Employee } from '@/domain/users/enterprise/entities/employee'
+import { Employee } from '@/domain/enterprise/entities/employee'
 import { EmployeeRepository } from '../../repositories/employee-repository'
 import { hash } from 'bcryptjs'
 import { UniqueId } from '@/core/entities/value-objects/unique-id'
-import { Code } from '@/domain/users/enterprise/entities/value-objects/Code'
+import { Code } from '@/domain/enterprise/entities/value-objects/Code'
 import { CompanyRepository } from '../../repositories/company-repository'
 
 interface CreateEmployeeUseCaseRequest {

@@ -1,7 +1,7 @@
 import { compare } from 'bcryptjs'
 import { sign } from "jsonwebtoken"
 
-import { Manager } from '@/domain/users/enterprise/entities/manager'
+import { Manager } from '@/domain/enterprise/entities/manager'
 import { type ManagerRepository } from '../../repositories/manager-repository'
 import { env } from '@/env'
 

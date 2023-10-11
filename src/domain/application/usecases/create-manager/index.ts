@@ -1,6 +1,6 @@
 import { hash } from 'bcryptjs'
 
-import { Manager } from '@/domain/users/enterprise/entities/manager'
+import { Manager } from '@/domain/enterprise/entities/manager'
 import { type ManagerRepository } from '../../repositories/manager-repository'
 
 interface CreateManagerUseCaseRequest {

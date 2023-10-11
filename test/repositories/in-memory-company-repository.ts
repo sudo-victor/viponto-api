@@ -1,4 +1,4 @@
-import { CompanyRepository } from "@/domain/users/application/repositories/company-repository"
+import { CompanyRepository } from "@/domain/application/repositories/company-repository"
 import { Company } from "@/domain/users/enterprise/entities/company";
 
 export class InMemoryCompanyRepository implements CompanyRepository {

@@ -1,4 +1,4 @@
-import { Company } from "@/domain/users/enterprise/entities/company";
+import { Company } from "@/domain/enterprise/entities/company";
 import { CompanyRepository } from "../../repositories/company-repository";
 import { ManagerRepository } from "../../repositories/manager-repository";
 

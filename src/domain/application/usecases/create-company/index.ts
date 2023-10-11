@@ -1,4 +1,4 @@
-import { Company } from '@/domain/users/enterprise/entities/company'
+import { Company } from '@/domain/enterprise/entities/company'
 import { UniqueId } from '@/core/entities/value-objects/unique-id'
 import { type CompanyRepository } from '../../repositories/company-repository'
 
