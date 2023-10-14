@@ -4,6 +4,7 @@ import { faker } from "@faker-js/faker"
 import { CreateManagerUseCase } from "."
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
 import { UniqueId } from "@/core/entities/value-objects/unique-id"
+import { ResourceAlreadyExistsError } from "@/core/errors/resource-already-exists-error"
 
 let managerRepository: InMemoryManagerRepository
 let sut: CreateManagerUseCase
@@ -36,8 +37,9 @@ describe('Create Manager Use Case', () => {
 
     await sut.execute(payload)
 
-    await expect(() => 
-      sut.execute(payload)
-    ).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceAlreadyExistsError)
   })
 })

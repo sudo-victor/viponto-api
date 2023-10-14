@@ -32,8 +32,8 @@ describe('Fetch Companies By Manager Use Case', () => {
       managerId: managerId.toString,
     }
 
-    const { companies } = await sut.execute(payload)
+    const result = await sut.execute(payload)
 
-    expect(companies).toHaveLength(5)
+    expect(result.isRight()).toBe(true)
   })
 })

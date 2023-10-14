@@ -6,6 +6,11 @@ import { describe, it, expect, beforeEach, vi } from "vitest"
 import { RegisterTimeTrackUseCase } from "."
 import { InMemoryTimeTrackRepository } from "test/repositories/in-memory-time-track-repository"
 import { makeTimeTrack } from "test/factories/make-time-track"
+import { TimeUpdateToFutureDateError } from "@/core/errors/time-update-to-future-date-error"
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { NotAllowedError } from "@/core/errors/not-allowed-error"
+import { DateConflictError } from "@/core/errors/date-conflict-error"
+import { UniqueId } from "@/core/entities/value-objects/unique-id"
 
 let timeTrackRepository: InMemoryTimeTrackRepository
 let sut: RegisterTimeTrackUseCase
@@ -53,18 +58,24 @@ describe('Update Workspace Use Case', () => {
       userId: timeTrack.ownerId.toString
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(TimeUpdateToFutureDateError)
   })
 
   it('should not be able to update a time track that doesnt exists', async () => {
     const payload = {
       description: faker.lorem.text(),
-      registeredAt: faker.date.soon(),
+      registeredAt: faker.date.past(),
       timeTrackId: faker.string.uuid(),
       userId: faker.string.uuid()
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
   it('should not be able to update a time track if user id diff', async () => {
@@ -74,18 +85,21 @@ describe('Update Workspace Use Case', () => {
 
     const payload = {
       description: faker.lorem.text(),
-      registeredAt: faker.date.soon(),
+      registeredAt: faker.date.past(),
       timeTrackId: timeTrack.id.toString,
       userId: randomUUID()
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 
   it('should not be able to update a time track if there is another time track with the same register time ', async () => {
-    const existingDate = new Date(2023, 10, 15, 12, 30)
-    await timeTrackRepository.create(await makeTimeTrack({}))
-    await timeTrackRepository.create(await makeTimeTrack({ registered_at: existingDate }))
+    const existingDate = faker.date.past()
+    await timeTrackRepository.create(await makeTimeTrack({ owner_id: new UniqueId('1') }))
+    await timeTrackRepository.create(await makeTimeTrack({ owner_id: new UniqueId('1') , registered_at: existingDate }))
 
     const [timeTrack1] = timeTrackRepository.items
 
@@ -96,6 +110,9 @@ describe('Update Workspace Use Case', () => {
       userId: timeTrack1.ownerId.toString
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(DateConflictError)
   })
 })

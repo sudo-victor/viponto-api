@@ -49,7 +49,8 @@ describe('Create Workspace Use Case', () => {
     }
 
     await sut.execute(payload)
+    const result = await sut.execute(payload)
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    expect(result.isLeft()).toBe(true)
   })
 })

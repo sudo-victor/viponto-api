@@ -4,6 +4,9 @@ import { hash } from 'bcryptjs'
 import { UniqueId } from '@/core/entities/value-objects/unique-id'
 import { Code } from '@/domain/enterprise/entities/value-objects/Code'
 import { CompanyRepository } from '../../repositories/company-repository'
+import { Either, left, right } from '@/core/either'
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
+import { NotAllowedError } from '@/core/errors/not-allowed-error'
 
 interface CreateEmployeeUseCaseRequest {
   name: string,
@@ -12,9 +15,12 @@ interface CreateEmployeeUseCaseRequest {
   managerId: string
 }
 
-interface CreateEmployeeUseCaseResponse {
-  employee: Employee
-}
+type CreateEmployeeUseCaseResponse = Either<
+  ResourceNotFoundError | NotAllowedError,
+  {
+    employee: Employee
+  }
+>
 
 export class CreateEmployeeUseCase {
   constructor (
@@ -31,11 +37,11 @@ export class CreateEmployeeUseCase {
     const company = await this.companyRepository.findById(companyId)
 
     if (!company) {
-      throw new Error('Company not found')
+      return left(new ResourceNotFoundError())
     }
 
     if (company.managerId.toString !== managerId) {
-      throw new Error('Not allowed')
+      return left(new NotAllowedError())
     }
 
     const employee = Employee.create({
@@ -47,8 +53,8 @@ export class CreateEmployeeUseCase {
 
     await this.employeeRepository.create(employee)
 
-    return {
+    return right({
       employee
-    }
+    })
   }
 }

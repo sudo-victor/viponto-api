@@ -2,6 +2,10 @@ import { type WorkspaceRepository } from '../../repositories/workspace-repositor
 import { UniqueId } from '@/core/entities/value-objects/unique-id'
 import { CompanyRepository } from '../../repositories/company-repository'
 import { Workspace } from '@/domain/enterprise/entities/workspace'
+import { Either, left, right } from '@/core/either'
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
+import { NotAllowedError } from '@/core/errors/not-allowed-error'
+import { ResourceAlreadyExistsError } from '@/core/errors/resource-already-exists-error'
 
 interface CreateWorkspaceUseCaseRequest {
   name: string
@@ -10,9 +14,12 @@ interface CreateWorkspaceUseCaseRequest {
   userId: string
 }
 
-interface CreateWorkspaceUseCaseResponse {
-  workspace: Workspace
-}
+type CreateWorkspaceUseCaseResponse = Either<
+  ResourceAlreadyExistsError | ResourceNotFoundError | NotAllowedError,
+  {
+    workspace: Workspace
+  }
+>
 
 export class CreateWorkspaceUseCase {
   constructor (
@@ -29,24 +36,24 @@ export class CreateWorkspaceUseCase {
     const company = await this.companyRepository.findById(companyId)
 
     if (!company) {
-      throw new Error('Company not found')
+      return left(new ResourceNotFoundError())
     }
 
     if (company.managerId.toString !== userId) {
-      throw new Error('Not allowed')
+      return left(new NotAllowedError())
     }
 
     const workspace = Workspace.create({ name, description, company_id: new UniqueId(companyId) })
 
     const workspaceAlreadyExists = await this.workspaceRepository.findBySlug(workspace.slug.value)
     if (workspaceAlreadyExists) {
-      throw new Error('Workspace already exists')
+      return left(new ResourceAlreadyExistsError())
     }
 
     await this.workspaceRepository.create(workspace)
 
-    return {
+    return right({
       workspace
-    }
+    })
   }
 }

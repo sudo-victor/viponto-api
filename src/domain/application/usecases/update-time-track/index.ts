@@ -1,5 +1,10 @@
 import { TimeTrack } from '@/domain/enterprise/entities/time-track'
 import { TimeTrackRepository } from '../../repositories/time-track-repository'
+import { Either, left, right } from '@/core/either'
+import { TimeUpdateToFutureDateError } from '@/core/errors/time-update-to-future-date-error'
+import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
+import { NotAllowedError } from '@/core/errors/not-allowed-error'
+import { DateConflictError } from '@/core/errors/date-conflict-error'
 
 interface RegisterTimeTrackUseCaseRequest {
   timeTrackId: string
@@ -8,9 +13,12 @@ interface RegisterTimeTrackUseCaseRequest {
   userId: string
 }
 
-interface RegisterTimeTrackUseCaseResponse {
-  timeTrack: TimeTrack
-}
+type RegisterTimeTrackUseCaseResponse = Either<
+  TimeUpdateToFutureDateError | ResourceNotFoundError | NotAllowedError,
+  {
+    timeTrack: TimeTrack
+  }
+>
 
 export class RegisterTimeTrackUseCase {
   constructor (
@@ -24,17 +32,17 @@ export class RegisterTimeTrackUseCase {
     description
   }: RegisterTimeTrackUseCaseRequest): Promise<RegisterTimeTrackUseCaseResponse> {
     if (new Date(registeredAt) > new Date()) {
-      throw new Error('Time track cannot be update to a future date')
+      return left(new TimeUpdateToFutureDateError())
     }
     
     const timeTrack = await this.timeTrackRepository.findById(timeTrackId)
 
     if (!timeTrack) {
-      throw new Error('Time track not found')
+      return left(new ResourceNotFoundError())
     }
 
     if (timeTrack.ownerId.toString !== userId) {
-      throw new Error('Not allowed')
+      return left(new NotAllowedError())
     }
 
     const timeTrackAlreadyExists = await this.timeTrackRepository.findByOwnerAndTime({
@@ -43,12 +51,12 @@ export class RegisterTimeTrackUseCase {
     })
 
     if (timeTrackAlreadyExists) {
-      throw new Error('Conflict with an existing time track')
+      return left(new DateConflictError())
     }
 
     timeTrack.registeredAt = new Date(registeredAt)
     timeTrack.description = description
 
-    return { timeTrack }
+    return right({ timeTrack })
   }
 }

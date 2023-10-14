@@ -2,6 +2,7 @@ import dayjs from "dayjs"
 
 import { TimeTrack } from "@/domain/enterprise/entities/time-track";
 import { TimeTrackRepository } from "../../repositories/time-track-repository";
+import { Either, right } from "@/core/either";
 
 interface FetchTimeTracksPerDayUseCaseRequest {
   workspaceId: string
@@ -10,9 +11,12 @@ interface FetchTimeTracksPerDayUseCaseRequest {
   endRange?: string | Date
 }
 
-interface FetchTimeTracksPerDayUseCaseResponse {
-  timeTracks: Record<string, TimeTrack[]>
-}
+type FetchTimeTracksPerDayUseCaseResponse = Either<
+  null,
+  {
+    timeTracks: Record<string, TimeTrack[]>
+  }
+>
 
 export class FetchTimeTracksPerDayUseCase {
 
@@ -31,13 +35,13 @@ export class FetchTimeTracksPerDayUseCase {
       workspaceId,
       range: {
         start: startRange ?? new Date(),
-        end: endRange ?? dayjs(new Date()).subtract(5, 'days').toDate(),
+        end: endRange ?? dayjs(new Date()).subtract(4, 'days').toDate(),
       }
     })
 
-    return {
+    return right({
       timeTracks: this.separateTimeTracksPerDays(timeTracks)
-    }
+    })
   }
 
   private separateTimeTracksPerDays(timeTracks: TimeTrack[]): Record<string, TimeTrack[]> {

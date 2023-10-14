@@ -7,6 +7,8 @@ import { UniqueId } from "@/core/entities/value-objects/unique-id"
 import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-repository"
 import { makeCompany } from "test/factories/make-company"
 import { randomUUID } from "crypto"
+import { NotAllowedError } from "@/core/errors/not-allowed-error"
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
 
 let workspaceRepository: InMemoryWorkspaceRepository
 let companyRepository: InMemoryCompanyRepository
@@ -46,9 +48,10 @@ describe('Create Workspace Use Case', () => {
       userId: randomUUID()
     }
 
-    await expect(() => 
-      sut.execute(payload)
-    ).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
   it('should not be able to create a workspace if an userId diff of managerId from company', async () => {
@@ -64,8 +67,9 @@ describe('Create Workspace Use Case', () => {
       userId: randomUUID()
     }
 
-    await expect(() => 
-      sut.execute(payload)
-    ).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 })

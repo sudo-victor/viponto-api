@@ -1,14 +1,19 @@
 import { Company } from "@/domain/enterprise/entities/company";
 import { CompanyRepository } from "../../repositories/company-repository";
 import { ManagerRepository } from "../../repositories/manager-repository";
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error";
+import { Either, left, right } from "@/core/either";
 
 interface FetchCompaniesByManagerUseCaseRequest {
   managerId: string
 }
 
-interface FetchCompaniesByManagerUseCaseResponse {
-  companies: Company[]
-}
+type FetchCompaniesByManagerUseCaseResponse = Either<
+  ResourceNotFoundError,
+  {
+    companies: Company[]
+  }
+>
 
 export class FetchCompaniesByManagerUseCase {
 
@@ -21,14 +26,14 @@ export class FetchCompaniesByManagerUseCase {
     const manager = await this.managerRepository.findById(managerId)
 
     if (!manager) {
-      throw new Error('Manager not found')
+      return left(new ResourceNotFoundError())
     }
 
     const companies = await this.companyRepository.findManyByManagerId(managerId)
 
-    return {
+    return right({
       companies
-    }
+    })
   }
 
 }

@@ -3,6 +3,8 @@ import { UniqueId } from '@/core/entities/value-objects/unique-id'
 import { CompanyRepository } from '../../repositories/company-repository'
 import { TimeTrack } from '@/domain/enterprise/entities/time-track'
 import { TimeTrackRepository } from '../../repositories/time-track-repository'
+import { Either, left, right } from '@/core/either'
+import { ResourceAlreadyExistsError } from '@/core/errors/resource-already-exists-error'
 
 interface RegisterTimeTrackUseCaseRequest {
   ownerId: string
@@ -10,9 +12,12 @@ interface RegisterTimeTrackUseCaseRequest {
   description?: string
 }
 
-interface RegisterTimeTrackUseCaseResponse {
-  timeTrack: TimeTrack
-}
+type RegisterTimeTrackUseCaseResponse = Either<
+  ResourceAlreadyExistsError,
+  {
+    timeTrack: TimeTrack
+  }
+>
 
 export class RegisterTimeTrackUseCase {
   constructor (
@@ -30,7 +35,7 @@ export class RegisterTimeTrackUseCase {
     })
 
     if (timeTrackAlreadyExists) {
-      throw new Error('Time track already exists')
+      return left(new ResourceAlreadyExistsError())
     }
 
     const timeTrack = TimeTrack.create({
@@ -41,6 +46,6 @@ export class RegisterTimeTrackUseCase {
 
     await this.timeTrackRepository.create(timeTrack)
 
-    return { timeTrack }
+    return right({ timeTrack })
   }
 }

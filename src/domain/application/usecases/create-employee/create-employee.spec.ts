@@ -7,6 +7,8 @@ import { UniqueId } from "@/core/entities/value-objects/unique-id"
 import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-repository"
 import { makeManager } from "test/factories/make-manager"
 import { makeCompany } from "test/factories/make-company"
+import { NotAllowedError } from "@/core/errors/not-allowed-error"
+import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
 
 let employeeRepository: InMemoryEmployeeRepository
 let companyRepository: InMemoryCompanyRepository
@@ -46,7 +48,10 @@ describe('Create Employee Use Case', () => {
       password: faker.internet.password(),
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 
   it('should not be able to create a employee if manager is not an admin of the current company', async () => {
@@ -61,6 +66,9 @@ describe('Create Employee Use Case', () => {
       password: faker.internet.password(),
     }
 
-    await expect(() => sut.execute(payload)).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute(payload)
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 })
