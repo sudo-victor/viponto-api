@@ -1,12 +1,14 @@
 import { Entity } from '@/core/entities/entity'
 import { type UniqueId } from '@/core/entities/value-objects/unique-id'
 import { Slug } from './value-objects/slug'
+import { WorkspaceValue } from './value-objects/period-type'
 
 export interface IWorkspace {
   name: string
   description?: string
   slug: Slug
   company_id: UniqueId,
+  value: WorkspaceValue
   created_at?: Date
 }
 
@@ -21,6 +23,10 @@ export class Workspace extends Entity<IWorkspace> {
 
   get slug () {
     return this.props.slug
+  }
+
+  get value () {
+    return this.props.value
   }
 
   get companyId () {

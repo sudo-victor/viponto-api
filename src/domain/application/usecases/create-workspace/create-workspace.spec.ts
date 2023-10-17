@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { faker } from "@faker-js/faker"
 
-import { CreateWorkspaceUseCase } from "."
+import { CreateWorkspaceUseCase, CreateWorkspaceUseCaseRequest } from "."
 import { InMemoryWorkspaceRepository } from "test/repositories/in-memory-workspace-repository"
 import { UniqueId } from "@/core/entities/value-objects/unique-id"
 import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-repository"
@@ -32,8 +32,10 @@ describe('Create Workspace Use Case', () => {
       name: faker.person.fullName(),
       description: faker.lorem.text(),
       companyId: company.id.toString,
+      periodType: 'hour',
+      value: 50,
       userId: managerId.toString
-    }
+    } as CreateWorkspaceUseCaseRequest
 
     await sut.execute(payload)
 
@@ -45,8 +47,10 @@ describe('Create Workspace Use Case', () => {
       name: faker.person.fullName(),
       description: faker.lorem.text(),
       companyId: randomUUID(),
+      periodType: 'hour',
+      value: 50,
       userId: randomUUID()
-    }
+    } as CreateWorkspaceUseCaseRequest
 
     const result = await sut.execute(payload)
 
@@ -64,8 +68,10 @@ describe('Create Workspace Use Case', () => {
       name: faker.person.fullName(),
       description: faker.lorem.text(),
       companyId: company.id.toString,
+      periodType: 'hour',
+      value: 50,
       userId: randomUUID()
-    }
+    } as CreateWorkspaceUseCaseRequest
 
     const result = await sut.execute(payload)
 

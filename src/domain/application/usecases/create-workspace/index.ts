@@ -6,11 +6,14 @@ import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { NotAllowedError } from '@/core/errors/not-allowed-error'
 import { ResourceAlreadyExistsError } from '@/core/errors/resource-already-exists-error'
+import { WorkspaceValue } from '@/domain/enterprise/entities/value-objects/period-type'
 
-interface CreateWorkspaceUseCaseRequest {
+export interface CreateWorkspaceUseCaseRequest {
   name: string
   description?: string
   companyId: string
+  periodType: 'hour' | 'month'
+  value: number
   userId: string
 }
 
@@ -31,7 +34,9 @@ export class CreateWorkspaceUseCase {
     name,
     description,
     companyId,
-    userId
+    userId,
+    periodType,
+    value
   }: CreateWorkspaceUseCaseRequest): Promise<CreateWorkspaceUseCaseResponse> {
     const company = await this.companyRepository.findById(companyId)
 
@@ -43,7 +48,12 @@ export class CreateWorkspaceUseCase {
       return left(new NotAllowedError())
     }
 
-    const workspace = Workspace.create({ name, description, company_id: new UniqueId(companyId) })
+    const workspace = Workspace.create({
+      name,
+      description,
+      value: WorkspaceValue.create({ period_type: periodType, value }),
+      company_id: new UniqueId(companyId)
+    })
 
     const workspaceAlreadyExists = await this.workspaceRepository.findBySlug(workspace.slug.value)
     if (workspaceAlreadyExists) {

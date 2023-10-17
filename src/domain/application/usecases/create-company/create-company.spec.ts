@@ -7,6 +7,8 @@ import { InMemoryCompanyRepository } from "test/repositories/in-memory-company-r
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
 import { Manager } from "@/domain/enterprise/entities/manager"
 import { hash } from "bcryptjs"
+import { randomUUID } from "crypto"
+import { NotAllowedError } from "@/core/errors/not-allowed-error"
 
 let companyRepository: InMemoryCompanyRepository
 let managerRepository: InMemoryManagerRepository
@@ -17,7 +19,7 @@ describe('Create Company Use Case', () => {
   beforeEach(() => {
     managerRepository = new InMemoryManagerRepository()
     companyRepository = new InMemoryCompanyRepository()
-    sut = new CreateCompanyUseCase(companyRepository)
+    sut = new CreateCompanyUseCase(companyRepository, managerRepository)
   })
 
   it('should be able to create a company', async () => {
@@ -37,5 +39,16 @@ describe('Create Company Use Case', () => {
     await sut.execute(payload)
     expect(companyRepository.items[0].id).toEqual(expect.any(UniqueId))
     expect(companyRepository.items[0].managerId.toString).toEqual(managerId.toString)
+  })
+
+  it('should not be able to create a company without a valid manager', async () => {
+    const payload = {
+      name: faker.company.name(),
+      managerId: randomUUID(),
+    }
+
+    const result = await sut.execute(payload)
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 })

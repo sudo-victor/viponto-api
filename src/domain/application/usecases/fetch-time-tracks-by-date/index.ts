@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { TimeTrack } from "@/domain/enterprise/entities/time-track";
 import { TimeTrackRepository } from "../../repositories/time-track-repository";
 import { Either, right } from "@/core/either";
+import { accumulateTimeDifferencesInHours } from "../../rules/accumulate-time-diff-in-hours";
 
 interface FetchTimeTracksByDateUseCaseRequest {
   workspaceId: string
@@ -37,20 +38,7 @@ export class FetchTimeTracksByDateUseCase {
 
     return right({
       timeTracks,
-      hours: this.accumulateTimeDifferencesInHours(timeTracks)
+      hours: accumulateTimeDifferencesInHours(timeTracks)
     })
-  }
-
-  private accumulateTimeDifferencesInHours(timeTracks: TimeTrack[]): number {
-    let totalHours = 0;
-  
-    for (let i = 0; i < timeTracks.length - 1; i += 2) {
-      const registeredAt1 = dayjs(timeTracks[i].registeredAt);
-      const registeredAt2 = dayjs(timeTracks[i + 1].registeredAt);
-      const timeDifferenceInHours = registeredAt2.diff(registeredAt1, 'hour', true);
-      totalHours += timeDifferenceInHours;
-    }
-  
-    return totalHours;
   }
 }
