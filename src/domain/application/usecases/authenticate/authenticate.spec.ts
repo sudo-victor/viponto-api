@@ -6,15 +6,25 @@ import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-r
 import { Manager } from "@/domain/enterprise/entities/manager"
 import { hash } from "bcryptjs"
 import { InvalidCredentialsError } from "@/core/errors/invalid-credentials-error"
+import { JwtEncrypter } from "@/infra/gateways/jwt-encrypter"
+import { BcryptHasher } from "@/infra/gateways/bcrypt-hash"
 
 let managerRepository: InMemoryManagerRepository
+let encrypter: JwtEncrypter
+let hasher: BcryptHasher
 let sut: AuthenticateUseCase
 
 describe('Authenticate Use Case', () => {
 
   beforeEach(() => {
     managerRepository = new InMemoryManagerRepository()
-    sut = new AuthenticateUseCase(managerRepository)
+    encrypter = new JwtEncrypter()
+    hasher = new BcryptHasher()
+    sut = new AuthenticateUseCase(
+      managerRepository,
+      encrypter,
+      hasher
+    )
   })
 
   it('should be able to create a session for a manager', async () => {

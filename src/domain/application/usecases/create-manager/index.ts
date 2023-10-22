@@ -4,6 +4,7 @@ import { Manager } from '@/domain/enterprise/entities/manager'
 import { type ManagerRepository } from '../../repositories/manager-repository'
 import { Either, left, right } from '@/core/either'
 import { ResourceAlreadyExistsError } from '@/core/errors/resource-already-exists-error'
+import { Hasher } from '../../criptography/hasher'
 
 interface CreateManagerUseCaseRequest {
   name: string
@@ -19,7 +20,10 @@ type CreateManagerUseCaseResponse = Either<
 >
 
 export class CreateManagerUseCase {
-  constructor (private readonly managerRepository: ManagerRepository) {}
+  constructor (
+    private readonly managerRepository: ManagerRepository,
+    private readonly hasher: Hasher
+  ) {}
 
   async execute ({
     name,
@@ -31,7 +35,9 @@ export class CreateManagerUseCase {
       return left(new ResourceAlreadyExistsError())
     }
 
-    const manager = Manager.create({ name, email, password_hash: await hash(password, 6) })
+    const hashedPassword = await this.hasher.hash(password)
+
+    const manager = Manager.create({ name, email, password_hash: hashedPassword })
 
     await this.managerRepository.create(manager)
 

@@ -7,6 +7,7 @@ import { CompanyRepository } from '../../repositories/company-repository'
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { NotAllowedError } from '@/core/errors/not-allowed-error'
+import { Hasher } from '../../criptography/hasher'
 
 interface CreateEmployeeUseCaseRequest {
   name: string,
@@ -25,7 +26,8 @@ type CreateEmployeeUseCaseResponse = Either<
 export class CreateEmployeeUseCase {
   constructor (
     private readonly employeeRepository: EmployeeRepository,
-    private readonly companyRepository: CompanyRepository
+    private readonly companyRepository: CompanyRepository,
+    private readonly hasher: Hasher,
   ) {}
 
   async execute ({
@@ -43,12 +45,14 @@ export class CreateEmployeeUseCase {
     if (company.managerId.toString !== managerId) {
       return left(new NotAllowedError())
     }
+    
+    const hashedPassword = await this.hasher.hash(password)
 
     const employee = Employee.create({
       name,
       code: new Code(name),
       company_id: new UniqueId(companyId),
-      password_hash: await hash(password, 8)
+      password_hash: hashedPassword
     })
 
     await this.employeeRepository.create(employee)

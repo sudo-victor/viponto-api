@@ -1,11 +1,11 @@
 import { compare } from 'bcryptjs'
-import { sign } from "jsonwebtoken"
 
 import { Manager } from '@/domain/enterprise/entities/manager'
 import { type ManagerRepository } from '../../repositories/manager-repository'
-import { env } from '@/env'
 import { Either, left, right } from '@/core/either'
 import { InvalidCredentialsError } from '@/core/errors/invalid-credentials-error'
+import { Encrypter } from '../../criptography/encrypter'
+import { Hasher } from '../../criptography/hasher'
 
 interface AuthenticateUseCaseRequest {
   email: string
@@ -21,7 +21,11 @@ type AuthenticateUseCaseResponse = Either<
 >
 
 export class AuthenticateUseCase {
-  constructor (private readonly managerRepository: ManagerRepository) {}
+  constructor (
+    private readonly managerRepository: ManagerRepository,
+    private readonly encrypter: Encrypter,
+    private readonly hasher: Hasher
+  ) {}
 
   async execute ({
     email,
@@ -33,12 +37,12 @@ export class AuthenticateUseCase {
       return left(new InvalidCredentialsError())
     }
 
-    const doesPasswordIsValid = await compare(password, manager.password)
+    const doesPasswordIsValid = await this.hasher.compare(password, manager.password)
     if (!doesPasswordIsValid) {
       return left(new InvalidCredentialsError())
     }
 
-    const token = sign({ id: manager.id.toString }, env.SECRET_KEY, { expiresIn: '15m' })
+    const token = this.encrypter.encrypt({ id: manager.id.toString })
 
     return right({
       token,

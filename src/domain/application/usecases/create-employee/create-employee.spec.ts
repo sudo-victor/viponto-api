@@ -9,9 +9,11 @@ import { makeManager } from "test/factories/make-manager"
 import { makeCompany } from "test/factories/make-company"
 import { NotAllowedError } from "@/core/errors/not-allowed-error"
 import { ResourceNotFoundError } from "@/core/errors/resource-not-found-error"
+import { BcryptHasher } from "@/infra/gateways/bcrypt-hash"
 
 let employeeRepository: InMemoryEmployeeRepository
 let companyRepository: InMemoryCompanyRepository
+let hasher: BcryptHasher
 let sut: CreateEmployeeUseCase
 
 describe('Create Employee Use Case', () => {
@@ -19,7 +21,8 @@ describe('Create Employee Use Case', () => {
   beforeEach(() => {
     employeeRepository = new InMemoryEmployeeRepository()
     companyRepository = new InMemoryCompanyRepository()
-    sut = new CreateEmployeeUseCase(employeeRepository, companyRepository)
+    hasher = new BcryptHasher()
+    sut = new CreateEmployeeUseCase(employeeRepository, companyRepository, hasher)
   })
 
   it('should be able to create a employee', async () => {
