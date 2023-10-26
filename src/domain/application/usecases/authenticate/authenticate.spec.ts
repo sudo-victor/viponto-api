@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { faker } from "@faker-js/faker"
+import { hash } from "bcryptjs"
 
 import { AuthenticateUseCase } from "."
+
 import { InMemoryManagerRepository } from "test/repositories/in-memory-manager-repository"
+
 import { Manager } from "@/domain/enterprise/entities/manager"
-import { hash } from "bcryptjs"
 import { InvalidCredentialsError } from "@/core/errors/invalid-credentials-error"
 import { JwtEncrypter } from "@/infra/gateways/jwt-encrypter"
 import { BcryptHasher } from "@/infra/gateways/bcrypt-hash"

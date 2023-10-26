@@ -49,13 +49,13 @@ export class GetWorkspaceEarnings {
     })
 
     const { period_type: periodType, value } = workspace.value.toValue()
-    const totalPeriod = accumulateTimeDifferencesInHours(timeTracks)
-    const total = totalPeriod * value
+    const accumulateTime = accumulateTimeDifferencesInHours(timeTracks)
+    const total = accumulateTime * value
 
     return right({
       periodType,
       value,
-      accumulateTime: totalPeriod,
+      accumulateTime,
       total
     })
   }

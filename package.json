@@ -4,9 +4,11 @@
   "description": "### Requisitos Funcionais Alternativos:",
   "main": "index.js",
   "scripts": {
+    "build": "tsup src",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "bootstrap": "node scripts/generate-secret.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +25,7 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vitest-globals": "^1.4.0",
+    "prisma": "^5.5.2",
     "tsup": "^7.2.0",
     "typescript": "*",
     "vite-tsconfig-paths": "^4.2.1",
@@ -30,6 +33,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.1.0",
+    "@prisma/client": "^5.5.2",
     "@types/node": "^20.8.4",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.10",

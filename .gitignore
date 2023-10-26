@@ -1,3 +1,8 @@
 node_modules
 yarn.lock
 package-lock.json
+rs256_private_key.pem
+rs256_public_key.pem
+priv_key.txt
+pub_key.txt
+.env

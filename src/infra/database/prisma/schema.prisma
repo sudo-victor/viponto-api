@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  MANAGER
+  EMPLOYEE
+}
+
+enum PaymentPeriod {
+  MONTH
+  HOUR
+  DAY
+}
+
+model User {
+  id String @id @unique @default(uuid())
+
+  name          String
+  email         String   @unique
+  password_hash String
+  code          String?
+  role          UserRole
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  companies Company[]
+  TimeTrack TimeTrack[]
+
+  @@map("users")
+}
+
+model Company {
+  id String @id @unique @default(uuid())
+
+  name       String
+  manager_id String
+
+  manager User @relation(fields: [manager_id], references: [id])
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  workspaces Workspace[]
+
+  @@map("companies")
+}
+
+model Workspace {
+  id String @id @unique @default(uuid())
+
+  name           String
+  description    String
+  slug           String
+  payment_period PaymentPeriod
+  payment_value  Int
+  company_id     String
+
+  company Company @relation(fields: [company_id], references: [id])
+
+  createdAt DateTime    @default(now())
+  TimeTrack TimeTrack[]
+
+  @@index([slug])
+  @@map("workspaces")
+}
+
+// workspace_id: UniqueId,
+// owner_id: UniqueId,
+// description?: string,
+// registered_at: Date
+
+model TimeTrack {
+  id String @id @unique @default(uuid())
+
+  description  String?
+  workspace_id String
+  user_id      String
+
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+  owner     User      @relation(fields: [user_id], references: [id])
+
+  registered_at DateTime @default(now())
+
+  @@map("time_tracks")
+}
